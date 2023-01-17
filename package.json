@@ -1,0 +1,20 @@
+{
+  "name": "masa-mainnet",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "patch-package"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@masa-finance/masa-sdk": "^1.0.3",
+    "console-stamp": "^3.1.0",
+    "ethers": "^5.7.2",
+    "patch-package": "^6.5.1",
+    "random-words": "^1.2.1"
+  }
+}

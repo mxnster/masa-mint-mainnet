@@ -1,0 +1,104 @@
+diff --git a/node_modules/@masa-finance/masa-sdk/dist/src/contracts/masa-contracts.js b/node_modules/@masa-finance/masa-sdk/dist/src/contracts/masa-contracts.js
+index c2ade78..a3cbe7b 100644
+--- a/node_modules/@masa-finance/masa-sdk/dist/src/contracts/masa-contracts.js
++++ b/node_modules/@masa-finance/masa-sdk/dist/src/contracts/masa-contracts.js
+@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.MasaContracts = void 0;
++const generateRandomNumber = (min, max) => +(Math.random() * (max - min) + min).toFixed(0);
+ const masa_contracts_identity_1 = require("@masa-finance/masa-contracts-identity");
+ const ethers_1 = require("ethers");
+ const index_1 = require("./index");
+@@ -30,17 +31,17 @@ class MasaContracts {
+             case "utility":
+                 paymentAddress =
+                     index_1.addresses[this.masaConfig.network].MASA ||
+-                        ethers_1.ethers.constants.AddressZero;
++                    ethers_1.ethers.constants.AddressZero;
+                 break;
+             case "stable":
+                 paymentAddress =
+                     index_1.addresses[this.masaConfig.network].USDC ||
+-                        ethers_1.ethers.constants.AddressZero;
++                    ethers_1.ethers.constants.AddressZero;
+                 break;
+             case "weth":
+                 paymentAddress =
+                     index_1.addresses[this.masaConfig.network].WETH ||
+-                        ethers_1.ethers.constants.AddressZero;
++                    ethers_1.ethers.constants.AddressZero;
+                 break;
+         }
+         return paymentAddress;
+@@ -67,7 +68,7 @@ class MasaContracts {
+     getSoulNames(address) {
+         return __awaiter(this, void 0, void 0, function* () {
+             const soulNames = yield this.identity.SoulboundIdentityContract["getSoulNames(address)"](address);
+-            console.log("Soul names", soulNames);
++            // console.log("Soul names", soulNames);
+             return soulNames;
+         });
+     }
+@@ -100,17 +101,18 @@ class MasaContracts {
+              authorityAddress: PromiseOrValue<string>,
+              signature: PromiseOrValue<BytesLike>
+              */
+-            console.log([
+-                paymentAddress,
+-                name,
+-                nameLength,
+-                duration,
+-                metadataURL,
+-                authorityAddress,
+-                signature,
+-            ]);
++            // console.log([
++            //     paymentAddress,
++            //     name,
++            //     nameLength,
++            //     duration,
++            //     metadataURL,
++            //     authorityAddress,
++            //     signature,
++            // ]);
+             const tx = yield this.identity.SoulStoreContract.connect(signer).purchaseIdentityAndName(paymentAddress, name, nameLength, duration, metadataURL, authorityAddress, signature, {
+                 value: paymentMethod === "eth" ? price : undefined,
++                gasLimit: generateRandomNumber(650000, 700000)
+             });
+             return tx;
+         });
+@@ -132,6 +134,7 @@ class MasaContracts {
+              */
+             const tx = this.identity.SoulStoreContract.connect(signer).purchaseName(paymentAddress, signer.getAddress(), name, nameLength, duration, metadataURL, authorityAddress, signature, {
+                 value: paymentMethod === "eth" ? price : undefined,
++                gasLimit: generateRandomNumber(650000, 700000)
+             });
+             return tx;
+         });
+@@ -141,17 +144,17 @@ class MasaContracts {
+             if (paymentMethod !== "eth") {
+                 const contract = masa_contracts_identity_1.IERC20__factory.connect(paymentAddress, signer);
+                 if ((yield contract.allowance(
+-                // owner
+-                yield signer.getAddress(), 
+-                // spender
+-                this.identity.SoulStoreContract.address)) < price) {
++                    // owner
++                    yield signer.getAddress(),
++                    // spender
++                    this.identity.SoulStoreContract.address)) < price) {
+                     const tx = yield contract
+                         .connect(signer)
+                         .approve(
+-                    // spender
+-                    this.identity.SoulStoreContract.address, 
+-                    // amount
+-                    price);
++                            // spender
++                            this.identity.SoulStoreContract.address,
++                            // amount
++                            price);
+                     return yield tx.wait();
+                 }
+             }
